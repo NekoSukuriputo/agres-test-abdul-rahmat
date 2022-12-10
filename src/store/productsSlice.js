@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { products as productsMock } from "src/mocks/products";
 
 const fetchProducts = createAsyncThunk(
-  "ProductsSlice/fetchProduct",
+  "products/fetchProduct",
   async (_thunkAPI) => {
     return new Promise((resolve, _reject) => {
       setTimeout(() => {
@@ -19,10 +19,18 @@ const initialState = {
     { label: "Redmi", value: "Redmi" },
     { label: "Poco", value: "Poco" },
   ],
+  product: {
+    id: "",
+    name: "",
+    sku: "",
+    brand: "",
+    description: "",
+    variants: [],
+  },
 };
 
 export const productsSlice = createSlice({
-  name: "ProductsSlice",
+  name: "products",
   initialState,
   reducers: {
     addProduct: (state, action) => {
@@ -30,10 +38,23 @@ export const productsSlice = createSlice({
     },
     deleteProduct: (state, action) => {
       const index = state.products.indexOf(action.payload);
-      state.product.splice(index, 1);
+      state.products.splice(index, 1);
     },
     getProduct: (state, action) => {
-      state.product.find((item) => item.id === action.payload.id);
+      return state.products.find((item) => item.id === action.payload.id);
+    },
+    setDataProduct: (state, action) => {
+      state.product = {
+        ...state.product,
+        ...action.payload,
+      };
+    },
+    addVariant: (state, action) => {
+      state.product.variants.push(action.payload);
+    },
+    deleteVariant: (state, action) => {
+      const index = state.product.variants.indexOf(action.payload);
+      state.product.variants.splice(index, 1);
     },
   },
   extraReducers: (builder) => {
@@ -43,4 +64,13 @@ export const productsSlice = createSlice({
   },
 });
 
+export const {
+  addProduct,
+  deleteProduct,
+  getProduct,
+  setDataProduct,
+  addVariant,
+  deleteVariant,
+} = productsSlice.actions;
 
+export default productsSlice.reducer;
