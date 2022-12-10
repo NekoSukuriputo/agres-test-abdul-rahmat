@@ -56,6 +56,16 @@ export const productsSlice = createSlice({
       const index = state.product.variants.indexOf(action.payload);
       state.product.variants.splice(index, 1);
     },
+    resetProduct: (state) => {
+      state.product = {
+        id: "",
+        name: "",
+        sku: "",
+        brand: "",
+        description: "",
+        variants: [],
+      }
+    }
   },
   extraReducers: (builder) => {
     builder.addCase(fetchProducts.fulfilled, (state, action) => {
@@ -71,6 +81,7 @@ export const {
   setDataProduct,
   addVariant,
   deleteVariant,
+  resetProduct
 } = productsSlice.actions;
 
 export default productsSlice.reducer;

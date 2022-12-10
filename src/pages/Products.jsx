@@ -21,13 +21,18 @@ import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import VariantForm from "src/components/VariantForm";
 
 import TableVariant from "src/components/TableVariant";
+import Button from "@mui/material/Button";
+
+import Snackbar from "src/components/SnackBar";
 
 import { v4 as uuid } from "uuid";
 
 import { useSelector, useDispatch } from "react-redux";
-import { setDataProduct } from "src/store/productsSlice";
+import { setDataProduct, addProduct, resetProduct } from "src/store/productsSlice";
 
 export default function Products() {
+  const [openSnackBar, setOpenSnackBar] = React.useState(false);
+
   const productName = useSelector((state) => state.products.product.name);
   const SKU = useSelector((state) => state.products.product.sku);
   const brand = useSelector((state) => state.products.product.brand);
@@ -44,8 +49,41 @@ export default function Products() {
     dispatch(setDataProduct({ brand: event.target.value }));
   };
 
+  const handleBack = () => {
+    dispatch(resetProduct());
+  };
+
+  const handleSubmit = async () => {
+    dispatch(
+      addProduct({
+        id: uuid(),
+        name: productName,
+        sku: SKU,
+        brand: brand,
+        description: description,
+        variants: variants,
+      })
+    );
+    setOpenSnackBar(true);
+    dispatch(resetProduct());
+  };
+
+  const handleCloseSnackBar = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setOpenSnackBar(false);
+  };
+
   return (
     <div>
+      <Snackbar
+        open={openSnackBar}
+        onClose={handleCloseSnackBar}
+        severity="success"
+        message="Suskes menambakan produk"
+      />
       <Card sx={{ minWidth: 275 }}>
         <CardContent>
           <Grid container spacing={3}>
@@ -121,6 +159,26 @@ export default function Products() {
             </Grid>
           </Grid>
         </CardContent>
+        <CardActions sx={{ padding: 5 }}>
+          <Button
+            variant="contained"
+            color="warning"
+            onClick={() => {
+              handleBack();
+            }}
+          >
+            Kembali
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => {
+              handleSubmit();
+            }}
+          >
+            Tambah Produk
+          </Button>
+        </CardActions>
       </Card>
     </div>
   );
