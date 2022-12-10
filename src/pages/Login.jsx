@@ -6,14 +6,43 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 
+import { useNavigate } from "react-router-dom";
+
+
+import { useSelector, useDispatch} from 'react-redux'
+import { setDataAuth } from 'src/store/authSlice'
+
 export default function SignIn() {
+
+  const navigate = useNavigate()
+
+  const email = useSelector((state) => state.auth.userData.email)
+  const password = useSelector((state) => state.auth.userData.password)
+
+  const dispatch = useDispatch()
+
+  const [emailError, setEmailError] = React.useState('');
+  const [passwordError, setPasswordError] = React.useState('');
+
+  const checkValidationForm = () =>{
+    !email ? setEmailError("Please enter email"): setEmailError('')
+    !password ? setPasswordError("Please enter password"): setPasswordError('')
+    if(!emailError&&!passwordError){
+      return true
+    }
+    return false
+  }
+
   const handleSubmit = (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+    const isValid = checkValidationForm();
+    if(isValid){
+      console.log({
+        email,
+        password,
+      });
+      navigate('/products')
+    }
   };
 
   return (
@@ -33,23 +62,29 @@ export default function SignIn() {
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
             <TextField
               margin="normal"
-              required
               fullWidth
               id="email"
               label="Email Address"
               name="email"
               autoComplete="email"
               autoFocus
+              defaultValue={email}
+              onChange={(e)=>{dispatch(setDataAuth({email: e.target.value})); setEmailError('')}}
+              error={!!emailError}
+              helperText={emailError}
             />
             <TextField
               margin="normal"
-              required
               fullWidth
               name="password"
               label="Password"
               type="password"
               id="password"
               autoComplete="current-password"
+              defaultValue={password}
+              onChange={(e)=>{dispatch(setDataAuth({password: e.target.value})); setPasswordError('')}}
+              error={!!passwordError}
+              helperText={passwordError}
             />
             <Button
               type="submit"
