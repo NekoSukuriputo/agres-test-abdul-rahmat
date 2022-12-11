@@ -76,20 +76,22 @@ export default function TableVariant({ isPreview }) {
                 <TableCell align="left">
                   Rp. {helpers.formatAmount(row.amount)}
                 </TableCell>
-                <RenderWhen isTrue={!isPreview}>
-                  <TableCell align="center">
-                    <Tooltip title="Hapus">
-                      <IconButton
-                        aria-label="delete"
-                        color="error"
-                        onClick={() => {
-                          onClickDeleteVarian(row);
-                        }}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </Tooltip>
-                  </TableCell>
+                <RenderWhen>
+                  <RenderWhen.If isTrue={!isPreview}>
+                    <TableCell align="center">
+                      <Tooltip title="Hapus">
+                        <IconButton
+                          aria-label="delete"
+                          color="error"
+                          onClick={() => {
+                            onClickDeleteVarian(row);
+                          }}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </Tooltip>
+                    </TableCell>
+                  </RenderWhen.If>
                 </RenderWhen>
               </TableRow>
             ))}
@@ -99,7 +101,3 @@ export default function TableVariant({ isPreview }) {
     </>
   );
 }
-
-TableVariant.defaultProps = {
-  isPreview: false,
-};

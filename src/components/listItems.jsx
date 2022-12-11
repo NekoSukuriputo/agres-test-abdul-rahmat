@@ -5,15 +5,17 @@ import ListItemText from '@mui/material/ListItemText';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 
+import { Link as RouterLink } from 'react-router-dom';
+
 export const mainListItems = (
   <React.Fragment>
-    <ListItemButton>
+    <ListItemButton component={RouterLink} to="/">
       <ListItemIcon>
         <DashboardIcon />
       </ListItemIcon>
       <ListItemText primary="Dashboard" />
     </ListItemButton>
-    <ListItemButton>
+    <ListItemButton component={RouterLink} to="/products">
       <ListItemIcon>
         <ShoppingCartIcon />
       </ListItemIcon>

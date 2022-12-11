@@ -30,6 +30,9 @@ import { v4 as uuid } from "uuid";
 import { useSelector, useDispatch } from "react-redux";
 import { setDataProduct, addProduct, resetProduct } from "src/store/productsSlice";
 
+import { useNavigate } from "react-router-dom";
+
+
 export default function Products() {
   const [openSnackBar, setOpenSnackBar] = React.useState(false);
 
@@ -45,12 +48,16 @@ export default function Products() {
 
   const dispatch = useDispatch();
 
+  const navigate = useNavigate();
+
+
   const handleChangeBrand = (event) => {
     dispatch(setDataProduct({ brand: event.target.value }));
   };
 
-  const handleBack = () => {
-    dispatch(resetProduct());
+  const handleBack = async () => {
+    await dispatch(resetProduct());
+    navigate("/products");
   };
 
   const handleSubmit = async () => {
@@ -150,7 +157,7 @@ export default function Products() {
               </Box>
               <RenderWhen>
                 <RenderWhen.If isTrue={variants.length > 0}>
-                  <TableVariant />
+                  <TableVariant isPreview={false}/>
                 </RenderWhen.If>
                 <RenderWhen.If isTrue>
                   <Typography variant="h6">Tidak Ada Varian</Typography>

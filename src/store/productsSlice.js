@@ -37,7 +37,9 @@ export const productsSlice = createSlice({
       state.products.push(action.payload);
     },
     deleteProduct: (state, action) => {
-      const index = state.products.indexOf(action.payload);
+      const index = state.products.findIndex(
+        (item) => item.id === action.payload.id
+      );
       state.products.splice(index, 1);
     },
     getProduct: (state, action) => {
@@ -69,7 +71,7 @@ export const productsSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(fetchProducts.fulfilled, (state, action) => {
-      state.products=action.payload;
+      state.products = action.payload;
     });
   },
 });
