@@ -23,13 +23,17 @@ export default function SignIn() {
   const [password, setPassword] = React.useState("");
 
   const checkValidationForm = () => {
-    !email ? setEmailError("Please enter email") : setEmailError("");
-    !password
-      ? setPasswordError("Please enter password")
-      : setPasswordError("");
-    if (!emailError && !passwordError) {
+    if (!email) {
+      setEmailError("Please enter email");
+    }
+    if (!password) {
+      setPasswordError("Please enter password");
+    }
+
+    if (email && password) {
       return true;
     }
+
     return false;
   };
 
@@ -62,7 +66,6 @@ export default function SignIn() {
             id="email"
             label="Email Address"
             name="email"
-            autoComplete="email"
             autoFocus
             defaultValue={email}
             onChange={(e) => {
@@ -79,7 +82,6 @@ export default function SignIn() {
             label="Password"
             type="password"
             id="password"
-            autoComplete="current-password"
             defaultValue={password}
             onChange={(e) => {
               setPassword(e.target.value);
