@@ -15,12 +15,12 @@ export default function SignIn() {
   const navigate = useNavigate();
 
   const email = useSelector((state) => state.auth.userData.email);
-  const password = useSelector((state) => state.auth.userData.password);
 
   const dispatch = useDispatch();
 
   const [emailError, setEmailError] = React.useState("");
   const [passwordError, setPasswordError] = React.useState("");
+  const [password, setPassword] = React.useState("");
 
   const checkValidationForm = () => {
     !email ? setEmailError("Please enter email") : setEmailError("");
@@ -37,11 +37,7 @@ export default function SignIn() {
     event.preventDefault();
     const isValid = checkValidationForm();
     if (isValid) {
-      console.log({
-        email,
-        password,
-      });
-      navigate("/products");
+      navigate("/");
     }
   };
 
@@ -86,7 +82,7 @@ export default function SignIn() {
             autoComplete="current-password"
             defaultValue={password}
             onChange={(e) => {
-              dispatch(setDataAuth({ password: e.target.value }));
+              setPassword(e.target.value);
               setPasswordError("");
             }}
             error={!!passwordError}

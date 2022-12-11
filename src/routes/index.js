@@ -13,6 +13,12 @@ import ProductForm from "src/components/ProductForm";
 
 const router = createBrowserRouter([
   {
+    path: "/login",
+    element: <Login />,
+    errorElement: <ErrorPage />,
+    index: true,
+  },
+  {
     path: "/",
     element: <DefaultLayout />,
     errorElement: <ErrorPage />,
@@ -29,13 +35,11 @@ const router = createBrowserRouter([
         path: "products/add",
         element: <ProductForm />,
       },
+      {
+        path: "products/:productId",
+        element: <ProductForm />,
+      },
     ],
-  },
-  {
-    path: "/login",
-    element: <Login />,
-    errorElement: <ErrorPage />,
-    index: true,
   },
 ]);
 

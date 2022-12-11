@@ -28,14 +28,20 @@ import Snackbar from "src/components/SnackBar";
 import { v4 as uuid } from "uuid";
 
 import { useSelector, useDispatch } from "react-redux";
-import { setDataProduct, addProduct, resetProduct } from "src/store/productsSlice";
+import {
+  setDataProduct,
+  addProduct,
+  resetProduct,
+  updateProduct,
+} from "src/store/productsSlice";
 
-import { useNavigate } from "react-router-dom";
-
+import { useNavigate, useParams } from "react-router-dom";
 
 export default function Products() {
   const [openSnackBar, setOpenSnackBar] = React.useState(false);
+  const [messageSnackbar, setMessageSnackbar] = React.useState("");
 
+  const idProduct = useSelector((state) => state.products.product.id);
   const productName = useSelector((state) => state.products.product.name);
   const SKU = useSelector((state) => state.products.product.sku);
   const brand = useSelector((state) => state.products.product.brand);
@@ -50,6 +56,7 @@ export default function Products() {
 
   const navigate = useNavigate();
 
+  const { productId } = useParams();
 
   const handleChangeBrand = (event) => {
     dispatch(setDataProduct({ brand: event.target.value }));
@@ -61,7 +68,8 @@ export default function Products() {
   };
 
   const handleSubmit = async () => {
-    dispatch(
+    setMessageSnackbar("Sukses menambahakan produk");
+    await dispatch(
       addProduct({
         id: uuid(),
         name: productName,
@@ -72,7 +80,8 @@ export default function Products() {
       })
     );
     setOpenSnackBar(true);
-    dispatch(resetProduct());
+    await dispatch(resetProduct());
+    navigate("/products");
   };
 
   const handleCloseSnackBar = (event, reason) => {
@@ -83,13 +92,30 @@ export default function Products() {
     setOpenSnackBar(false);
   };
 
+  const handleUpdate = async () => {
+    setMessageSnackbar("Sukses mengupdate produk");
+    await dispatch(
+      updateProduct({
+        id: idProduct,
+        name: productName,
+        sku: SKU,
+        brand: brand,
+        description: description,
+        variants: variants,
+      })
+    );
+    setOpenSnackBar(true);
+    await dispatch(resetProduct());
+    navigate("/products");
+  };
+
   return (
     <div>
       <Snackbar
         open={openSnackBar}
         onClose={handleCloseSnackBar}
         severity="success"
-        message="Suskes menambakan produk"
+        message={messageSnackbar}
       />
       <Card sx={{ minWidth: 275 }}>
         <CardContent>
@@ -157,7 +183,7 @@ export default function Products() {
               </Box>
               <RenderWhen>
                 <RenderWhen.If isTrue={variants.length > 0}>
-                  <TableVariant isPreview={false}/>
+                  <TableVariant isPreview={false} />
                 </RenderWhen.If>
                 <RenderWhen.If isTrue>
                   <Typography variant="h6">Tidak Ada Varian</Typography>
@@ -176,15 +202,30 @@ export default function Products() {
           >
             Kembali
           </Button>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => {
-              handleSubmit();
-            }}
-          >
-            Tambah Produk
-          </Button>
+          <RenderWhen>
+            <RenderWhen.If isTrue={productId && productId !== ""}>
+              <Button
+                variant="contained"
+                color="success"
+                onClick={() => {
+                  handleUpdate();
+                }}
+              >
+                Upadate Produk
+              </Button>
+            </RenderWhen.If>
+            <RenderWhen.If isTrue>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => {
+                  handleSubmit();
+                }}
+              >
+                Tambah Produk
+              </Button>
+            </RenderWhen.If>
+          </RenderWhen>
         </CardActions>
       </Card>
     </div>

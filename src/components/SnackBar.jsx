@@ -16,7 +16,7 @@ export default function SnackbarComponent({
   return (
     <Snackbar
       open={open}
-      autoHideDuration={2000}
+      autoHideDuration={1500}
       onClose={onClose}
       anchorOrigin={{ vertical: "top", horizontal: "center" }}
     >

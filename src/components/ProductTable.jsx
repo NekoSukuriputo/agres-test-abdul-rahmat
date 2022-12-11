@@ -10,6 +10,7 @@ import Paper from "@mui/material/Paper";
 
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
 
 import Tooltip from "@mui/material/Tooltip";
 
@@ -25,11 +26,13 @@ import parseHtml from "html-react-parser";
 import { useSelector, useDispatch } from "react-redux";
 import {
   deleteProduct,
-  fetchProducts,
   setDataProduct,
   resetProduct,
 } from "src/store/productsSlice";
 import RenderWhen from "src/components/RenderWhen";
+
+import { useNavigate } from "react-router-dom";
+
 
 const tableHeader = ["Nama", "SKU", "Brand", "Deskripsi", "Varian", ""];
 
@@ -53,10 +56,12 @@ export default function TableProducts() {
   const [openVariant, setOpenVariant] = React.useState(false);
   const [openSnackBar, setOpenSnackBar] = React.useState(false);
 
+  const navigate = useNavigate();
 
-  React.useEffect(() => {
-    dispatch(fetchProducts());
-  }, [dispatch]);
+
+//   React.useEffect(() => {
+//     dispatch(fetchProducts());
+//   }, [dispatch]);
 
   const handleCloseVariant = async () => {
     await dispatch(resetProduct());
@@ -66,6 +71,10 @@ export default function TableProducts() {
   const handleOpenVariant = async (product) => {
     await dispatch(setDataProduct(product));
     setOpenVariant(true);
+  };
+  const onClickEditProduct = async (product) => {
+    await dispatch(setDataProduct(product));
+    navigate(`/products/${product.id}`)
   };
 
   const onClickDeleteProduct = async (product) => {
@@ -139,6 +148,17 @@ export default function TableProducts() {
                   </RenderWhen>
                 </TableCell>
                 <TableCell align="center">
+                  <Tooltip title="Edit">
+                    <IconButton
+                      aria-label="edit"
+                      color="primary"
+                      onClick={() => {
+                        onClickEditProduct(row);
+                      }}
+                    >
+                      <EditIcon />
+                    </IconButton>
+                  </Tooltip>
                   <Tooltip title="Hapus">
                     <IconButton
                       aria-label="delete"
