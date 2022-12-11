@@ -19,8 +19,9 @@ import helpers from "src/helpers";
 import { deleteVariant } from "src/store/productsSlice";
 
 import { useSelector, useDispatch } from "react-redux";
+import RenderWhen from "./RenderWhen";
 
-export default function TableVariant() {
+export default function TableVariant({ isPreview }) {
   const dispatch = useDispatch();
 
   const variants = useSelector((state) => state.products.product.variants);
@@ -75,19 +76,21 @@ export default function TableVariant() {
                 <TableCell align="left">
                   Rp. {helpers.formatAmount(row.amount)}
                 </TableCell>
-                <TableCell align="center">
-                  <Tooltip title="Hapus">
-                    <IconButton
-                      aria-label="delete"
-                      color="error"
-                      onClick={() => {
-                        onClickDeleteVarian(row);
-                      }}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </Tooltip>
-                </TableCell>
+                <RenderWhen isTrue={!isPreview}>
+                  <TableCell align="center">
+                    <Tooltip title="Hapus">
+                      <IconButton
+                        aria-label="delete"
+                        color="error"
+                        onClick={() => {
+                          onClickDeleteVarian(row);
+                        }}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </TableCell>
+                </RenderWhen>
               </TableRow>
             ))}
           </TableBody>
@@ -96,3 +99,7 @@ export default function TableVariant() {
     </>
   );
 }
+
+TableVariant.defaultProps = {
+  isPreview: false,
+};

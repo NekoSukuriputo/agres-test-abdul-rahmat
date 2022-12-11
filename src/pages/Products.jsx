@@ -1,71 +1,81 @@
 import * as React from "react";
-import Grid from "@mui/material/Grid";
-import TextField from "@mui/material/TextField";
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import Select from "@mui/material/Select";
-import Box from "@mui/material/Box";
-
-import Typography from "@mui/material/Typography";
-
-import Card from "@mui/material/Card";
-import CardActions from "@mui/material/CardActions";
-import CardContent from "@mui/material/CardContent";
-
-import RenderWhen from "src/components/RenderWhen";
-
-import { CKEditor } from "@ckeditor/ckeditor5-react";
-import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
-
-import VariantForm from "src/components/VariantForm";
-
-import TableVariant from "src/components/TableVariant";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
 import Button from "@mui/material/Button";
+import Paper from "@mui/material/Paper";
+
+import IconButton from "@mui/material/IconButton";
+import DeleteIcon from "@mui/icons-material/Delete";
+
+import Tooltip from "@mui/material/Tooltip";
 
 import Snackbar from "src/components/SnackBar";
+import TableVariant from "src/components/TableVariant";
 
-import { v4 as uuid } from "uuid";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
+
+import helpers from "src/helpers";
+
+import parseHtml from "html-react-parser";
 
 import { useSelector, useDispatch } from "react-redux";
-import { setDataProduct, addProduct, resetProduct } from "src/store/productsSlice";
+import {
+  deleteProduct,
+  getProduct,
+  fetchProducts,
+  setDataProduct,
+  resetProduct,
+} from "src/store/productsSlice";
+import RenderWhen from "src/components/RenderWhen";
 
-export default function Products() {
+const tableHeader = ["Nama", "SKU", "Brand", "Deskripsi", "Varian", ""];
+
+const ViewVarian = ({ open, onClose }) => {
+  return (
+    <>
+      <Dialog open={open} onClose={onClose}>
+        <DialogTitle>Data Varian</DialogTitle>
+        <DialogContent>
+          <TableVariant isPreview={true} />
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+};
+
+export default function TableProducts() {
+  const dispatch = useDispatch();
+  const products = useSelector((state) => state.products.products);
+
+  const [openVariant, setOpenVariant] = React.useState(false);
   const [openSnackBar, setOpenSnackBar] = React.useState(false);
 
-  const productName = useSelector((state) => state.products.product.name);
-  const SKU = useSelector((state) => state.products.product.sku);
-  const brand = useSelector((state) => state.products.product.brand);
-  const description = useSelector(
-    (state) => state.products.product.description
-  );
-  const variants = useSelector((state) => state.products.product.variants);
 
-  const brandOptions = useSelector((state) => state.products.brands);
+  React.useEffect(() => {
+    dispatch(fetchProducts());
+  }, [dispatch]);
 
-  const dispatch = useDispatch();
-
-  const handleChangeBrand = (event) => {
-    dispatch(setDataProduct({ brand: event.target.value }));
+  const handleCloseVariant = async () => {
+    await dispatch(resetProduct());
+    setOpenVariant(false);
   };
 
-  const handleBack = () => {
-    dispatch(resetProduct());
+  const handleOpenVariant = async (product) => {
+    await dispatch(setDataProduct(product));
+    setOpenVariant(true);
   };
 
-  const handleSubmit = async () => {
-    dispatch(
-      addProduct({
-        id: uuid(),
-        name: productName,
-        sku: SKU,
-        brand: brand,
-        description: description,
-        variants: variants,
-      })
-    );
+  const onClickDeleteProduct = async (product) => {
+    await dispatch(deleteProduct(product));
     setOpenSnackBar(true);
-    dispatch(resetProduct());
+
   };
 
   const handleCloseSnackBar = (event, reason) => {
@@ -77,109 +87,79 @@ export default function Products() {
   };
 
   return (
-    <div>
+    <>
       <Snackbar
         open={openSnackBar}
         onClose={handleCloseSnackBar}
         severity="success"
-        message="Suskes menambakan produk"
+        message="Suskes menghapus produk"
       />
-      <Card sx={{ minWidth: 275 }}>
-        <CardContent>
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <TextField
-                required
-                id="productName"
-                name="productName"
-                label="Nama Produk"
-                fullWidth
-                variant="outlined"
-                defaultValue={productName}
-                onChange={(e) => {
-                  dispatch(setDataProduct({ name: e.target.value }));
+      <TableContainer component={Paper}>
+        <Table sx={{ minWidth: 650 }} aria-label="simple table">
+          <TableHead>
+            <TableRow>
+              {tableHeader.map((item, index) => (
+                <TableCell align="left" key={index}>
+                  {item}
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {products.map((row) => (
+              <TableRow
+                key={row.id}
+                sx={{
+                  "&:last-child td, &:last-child th": { border: 0 },
                 }}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                required
-                id="sku"
-                name="sku"
-                label="SKU"
-                fullWidth
-                variant="outlined"
-                defaultValue={SKU}
-                onChange={(e) => {
-                  dispatch(setDataProduct({ sku: e.target.value }));
-                }}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <FormControl fullWidth>
-                <InputLabel id="demo-select-small">Brand</InputLabel>
-                <Select
-                  value={brand}
-                  label="Brand"
-                  onChange={handleChangeBrand}
-                >
-                  {brandOptions.map((item, index) => (
-                    <MenuItem key={index} value={item.value}>
-                      {item.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant="subtitle1">Deskripsi</Typography>
-              <CKEditor
-                editor={ClassicEditor}
-                data={description}
-                onChange={(_event, editor) => {
-                  const data = editor.getData();
-                  //   console.log({ event, editor, data });
-                  dispatch(setDataProduct({ description: data }));
-                }}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant="subtitle1">Varian</Typography>
-              <Box sx={{ padding: 2 }}>
-                <VariantForm />
-              </Box>
-              <RenderWhen>
-                <RenderWhen.If isTrue={variants.length > 0}>
-                  <TableVariant />
-                </RenderWhen.If>
-                <RenderWhen.If isTrue>
-                  <Typography variant="h6">Tidak Ada Varian</Typography>
-                </RenderWhen.If>
-              </RenderWhen>
-            </Grid>
-          </Grid>
-        </CardContent>
-        <CardActions sx={{ padding: 5 }}>
-          <Button
-            variant="contained"
-            color="warning"
-            onClick={() => {
-              handleBack();
-            }}
-          >
-            Kembali
-          </Button>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => {
-              handleSubmit();
-            }}
-          >
-            Tambah Produk
-          </Button>
-        </CardActions>
-      </Card>
-    </div>
+              >
+                <TableCell component="th" scope="row">
+                  {row.name}
+                </TableCell>
+                <TableCell align="left">{row.sku}</TableCell>
+                <TableCell align="left">{row.brand}</TableCell>
+                <TableCell align="left">
+                  {row.description ? parseHtml(row.description) : "-"}
+                </TableCell>
+                <TableCell align="left">
+                  <RenderWhen>
+                    <RenderWhen.If
+                      isTrue={row.variants && row.variants.length > 0}
+                    >
+                      <Button
+                        variant="outlined"
+                        onClick={() => {
+                          handleOpenVariant(row);
+                        }}
+                      >
+                        Lihat Varian
+                      </Button>
+                      <ViewVarian
+                        open={openVariant}
+                        onClose={handleCloseVariant}
+                      />
+                    </RenderWhen.If>
+                    <RenderWhen.If isTrue>Tidak Ada Varian</RenderWhen.If>
+                  </RenderWhen>
+                </TableCell>
+                <TableCell align="center">
+                  <Tooltip title="Hapus">
+                    <IconButton
+                      aria-label="delete"
+                      color="error"
+                      onClick={() => {
+                        onClickDeleteProduct(row);
+                      }}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </Tooltip>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </>
   );
 }
